@@ -1,0 +1,31 @@
+version: "3.9"
+services:
+  demo:
+    build: .
+    container_name: demo
+    restart: always
+    ports:
+      - "9080:9080"
+    networks:
+      - drVisit
+
+  mysql:
+    image: "mysql:latest"
+    container_name: "drVisitMySql"
+    restart: always
+    environment:
+      MYSQL_DATABASE: doctor_visit
+      MYSQL_ROOT_USER: root
+      MYSQL_ROOT_PASSWORD: insurelee@1234
+    ports:
+      - "3306:3306"
+    networks:
+      - drVisit
+volumes:
+  drVisit:
+    driver: local
+
+networks:
+  drVisit:
+    driver: bridge
+
