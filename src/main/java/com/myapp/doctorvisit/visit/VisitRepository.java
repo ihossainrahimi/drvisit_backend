@@ -40,5 +40,5 @@ public interface VisitRepository extends JpaRepository<Visit, Integer> {
     List<Visit> findAllByCustomerId(Integer customerId);
 
     @Query("select visit from Visit visit where visit.customerId = :customerId and visit.startedAt >= :from and visit.endAt <= :to")
-    List<Visit> findAllByCustomerIdAndBetweenDates(Integer customerId, LocalDateTime localDateTime, LocalDateTime localDateTime1);
+    List<Visit> findAllByCustomerIdAndBetweenDates(Integer customerId, LocalDateTime from, LocalDateTime to);
 }
