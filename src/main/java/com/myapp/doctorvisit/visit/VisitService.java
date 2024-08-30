@@ -1,5 +1,6 @@
 package com.myapp.doctorvisit.visit;
 
+import com.myapp.doctorvisit.visit.controller.CustomerVisitsDto;
 import com.myapp.doctorvisit.visit.controller.VisitCreationDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -73,5 +74,24 @@ public class VisitService {
 
     public void updateScheduleAvailability(Integer id, Integer customerId) {
         visitRepository.updateVisitAvailability(id, customerId);
+    }
+
+    public List<Visit> getAllDoctorsVisitsByOptionalDate(Integer doctorId, LocalDate from, LocalDate to) {
+        if (from != null) {
+            return visitRepository.findAllByDoctorIdAndBetweenDates(doctorId, from.atStartOfDay(), to.atStartOfDay());
+        } else return visitRepository.findAllByDoctorId(doctorId);
+    }
+
+    public CustomerVisitsDto getALlCustomerVisits(Integer customerId, LocalDate from, LocalDate to) {
+        List<Visit> visits;
+        List<Visit> onGoingVisits = new ArrayList<>();
+        List<Visit> lastVisits = new ArrayList<>();
+        if (from != null) {
+            visits = visitRepository.findAllByCustomerIdAndBetweenDates(customerId, from.atStartOfDay(), to.atStartOfDay());
+        } else visits = visitRepository.findAllByCustomerId(customerId);
+
+        visits.stream().filter(item -> item.getStartedAt().isAfter(LocalDateTime.now())).forEach(onGoingVisits::add);
+        visits.stream().filter(item -> item.getStartedAt().isBefore(LocalDateTime.now())).forEach(lastVisits::add);
+        return new CustomerVisitsDto(onGoingVisits, lastVisits);
     }
 }

@@ -3,7 +3,6 @@ package com.myapp.doctorvisit.visit.controller;
 import com.myapp.doctorvisit.visit.Visit;
 import com.myapp.doctorvisit.visit.VisitService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -24,6 +23,16 @@ public class VisitController {
     @GetMapping("/doctors/{doctorId}")
     public List<Visit> findAllByDoctorIdAndBetweenDates(@PathVariable Integer doctorId, @RequestParam LocalDate from) {
         return visitService.findAllFreeByDoctorIdAndBetweenDates(doctorId, from);
+    }
+
+    @GetMapping("/doctors/{doctorId}/all")
+    public List<Visit> getAllDoctorVisits(@PathVariable Integer doctorId, @RequestParam LocalDate from, @RequestParam LocalDate to) {
+        return visitService.getAllDoctorsVisitsByOptionalDate(doctorId, from, to);
+    }
+
+    @GetMapping("/customers/{customerId}")
+    public CustomerVisitsDto getCustomerVisits(@PathVariable Integer customerId, @RequestParam LocalDate from, @RequestParam LocalDate to) {
+        return visitService.getALlCustomerVisits(customerId, from, to);
     }
 
     @PutMapping("/{id}/customers/{customerId}")

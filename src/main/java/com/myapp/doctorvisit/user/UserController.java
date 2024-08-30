@@ -1,10 +1,7 @@
 package com.myapp.doctorvisit.user;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -17,4 +14,10 @@ public class UserController {
     public User getUserByUsername(@PathVariable String username) {
         return userService.getUserByUsername(username);
     }
+
+    @PutMapping
+    public User updateUserInfo(@RequestBody User user) {
+        return userService.updateUserInfo(user);
+    }
+
 }
