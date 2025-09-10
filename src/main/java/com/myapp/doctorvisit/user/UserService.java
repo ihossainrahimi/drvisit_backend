@@ -18,15 +18,12 @@ public class UserService {
     }
 
     public User updateUserInfo(User updatedUser) {
-        User user = userRepository.findById(updatedUser.getId()).orElseThrow(UserNotFoundException::new);
-        user.setPhoneNumber(updatedUser.getPhoneNumber());
+        User user = userRepository.findByUsername(updatedUser.getUsername()).orElseThrow(UserNotFoundException::new);
         user.setFirstName(updatedUser.getFirstName());
         user.setLastName(updatedUser.getLastName());
         user.setGender(updatedUser.getGender());
         user.setAddress(updatedUser.getAddress());
         user.setNationalId(updatedUser.getNationalId());
-        user.setUsername(updatedUser.getUsername());
-        user.setPassword(updatedUser.getPassword());
-        return userRepository.save(updatedUser);
+        return userRepository.save(user);
     }
 }

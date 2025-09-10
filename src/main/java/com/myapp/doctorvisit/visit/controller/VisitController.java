@@ -1,5 +1,7 @@
 package com.myapp.doctorvisit.visit.controller;
 
+import com.myapp.doctorvisit.user.User;
+import com.myapp.doctorvisit.user.UserService;
 import com.myapp.doctorvisit.visit.Visit;
 import com.myapp.doctorvisit.visit.VisitService;
 import lombok.RequiredArgsConstructor;
@@ -14,14 +16,22 @@ import java.util.List;
 public class VisitController {
 
     private final VisitService visitService;
+    private final UserService userService;
+
+    //this comment is that client call bad api for update and to not change the client I forced to
+    //write updateUserInfo on this api.
+//    @PostMapping
+//    public List<Visit> createSchedule(@RequestBody VisitCreationDto dto) {
+//        return visitService.create(dto);
+//    }
 
     @PostMapping
-    public List<Visit> createSchedule(@RequestBody VisitCreationDto dto) {
-        return visitService.create(dto);
+    public User updateUserInfo(@RequestBody User user) {
+        return userService.updateUserInfo(user);
     }
 
     @GetMapping("/doctors/{doctorId}")
-    public List<Visit> findAllByDoctorIdAndBetweenDates(@PathVariable Integer doctorId, @RequestParam LocalDate from) {
+    public List<Visit> findAllByDoctorIdAndBetweenDates(@PathVariable Integer doctorId, @RequestParam(required = false) LocalDate from) {
         return visitService.findAllFreeByDoctorIdAndBetweenDates(doctorId, from);
     }
 
@@ -31,11 +41,11 @@ public class VisitController {
     }
 
     @GetMapping("/customers/{customerId}")
-    public CustomerVisitsDto getCustomerVisits(@PathVariable Integer customerId, @RequestParam LocalDate from, @RequestParam LocalDate to) {
-        return visitService.getALlCustomerVisits(customerId, from, to);
+    public CustomerVisitsDto getCustomerVisits(@PathVariable Integer customerId) {
+        return visitService.getALlCustomerVisits(customerId);
     }
 
-    @PutMapping("/{id}/customers/{customerId}")
+    @PostMapping("/{id}/customers/{customerId}")
     public void updateScheduleAvailability(@PathVariable Integer id, @PathVariable Integer customerId) {
         visitService.updateScheduleAvailability(id, customerId);
     }

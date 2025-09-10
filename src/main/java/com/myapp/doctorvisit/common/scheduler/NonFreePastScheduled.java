@@ -11,7 +11,6 @@ public class NonFreePastScheduled {
     private final VisitService visitService;
 
 
-    @Scheduled(fixedRate = 60 * 1000)
     public void updateAllByIsFreeAndFromBeforeNow() {
         visitService.updateAllByIsFreeAndFromBeforeNow();
     }

@@ -25,6 +25,7 @@ public interface VisitRepository extends JpaRepository<Visit, Integer> {
     @Query(value = "update visit set is_free = false where is_free = true and minute(started_at) <= minute(now())", nativeQuery = true)
     void updateAllByIsFreeAndFromBeforeNow();
 
+    @Query(value = "select visit from Visit visit where visit.doctorId = :doctorId and visit.isFree = true")
     List<Visit> findAllFreeByDoctorId(Integer doctorId);
 
     @Modifying

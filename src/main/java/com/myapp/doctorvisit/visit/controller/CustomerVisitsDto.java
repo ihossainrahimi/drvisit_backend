@@ -13,6 +13,6 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CustomerVisitsDto {
-    List<Visit> lastVisits;
-    List<Visit> onGoingVisits;
+    List<VisitDto> lastVisits;
+    List<VisitDto> onGoingVisits;
 }

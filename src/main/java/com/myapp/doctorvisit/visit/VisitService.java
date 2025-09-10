@@ -1,7 +1,12 @@
 package com.myapp.doctorvisit.visit;
 
+import com.myapp.doctorvisit.doctor.Doctor;
+import com.myapp.doctorvisit.doctor.DoctorRepository;
+import com.myapp.doctorvisit.professional.Professional;
+import com.myapp.doctorvisit.professional.ProfessionalRepository;
 import com.myapp.doctorvisit.visit.controller.CustomerVisitsDto;
 import com.myapp.doctorvisit.visit.controller.VisitCreationDto;
+import com.myapp.doctorvisit.visit.controller.VisitDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -9,13 +14,14 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class VisitService {
 
     private final VisitRepository visitRepository;
+    private final DoctorRepository doctorRepository;
+    private final ProfessionalRepository professionalRepository;
 
     public List<Visit> create(VisitCreationDto dto) {
         List<Visit> visits = new ArrayList<>();
@@ -45,13 +51,7 @@ public class VisitService {
     }
 
     public List<Visit> findAllFreeByDoctorIdAndBetweenDates(Integer doctorId, LocalDate from) {
-        if (from != null) {
-            LocalDateTime to = from.plusDays(1).atStartOfDay();
-            return visitRepository.findAllFreeByDoctorIdAndBetweenDates(doctorId, from.atStartOfDay(), to)
-                    .stream()
-                    .filter(item -> item.getStartedAt().isBefore(LocalDateTime.now()))
-                    .collect(Collectors.toList());
-        } else return visitRepository.findAllFreeByDoctorId(doctorId);
+        return visitRepository.findAllFreeByDoctorId(doctorId);
     }
 
     public Visit getById(Integer id) {
@@ -82,16 +82,23 @@ public class VisitService {
         } else return visitRepository.findAllByDoctorId(doctorId);
     }
 
-    public CustomerVisitsDto getALlCustomerVisits(Integer customerId, LocalDate from, LocalDate to) {
-        List<Visit> visits;
-        List<Visit> onGoingVisits = new ArrayList<>();
-        List<Visit> lastVisits = new ArrayList<>();
-        if (from != null) {
-            visits = visitRepository.findAllByCustomerIdAndBetweenDates(customerId, from.atStartOfDay(), to.atStartOfDay());
-        } else visits = visitRepository.findAllByCustomerId(customerId);
+    public CustomerVisitsDto getALlCustomerVisits(Integer customerId) {
+        List<VisitDto> onGoingVisits = new ArrayList<>();
+        List<VisitDto> lastVisits = new ArrayList<>();
+        List<Visit> visits = visitRepository.findAllByCustomerId(customerId);
 
-        visits.stream().filter(item -> item.getStartedAt().isAfter(LocalDateTime.now())).forEach(onGoingVisits::add);
-        visits.stream().filter(item -> item.getStartedAt().isBefore(LocalDateTime.now())).forEach(lastVisits::add);
+        visits.stream().filter(item -> item.getStartedAt().isBefore(LocalDateTime.now())).forEach(item -> {
+            Doctor doctor = doctorRepository.findById(item.getDoctorId()).orElseThrow();
+            Professional professional = professionalRepository.findById(doctor.getProfessionalId()).orElseThrow();
+            var visitDto = new VisitDto(item.getId(), item.getDoctorId(), doctor.getTitle(), professional.getTitle(), doctor.getVisitFee(), item.getCustomerId(), item.getStartedAt(), item.getEndAt(), item.getDuration(), item.getIsFree(), item.getCreatedAt());
+            onGoingVisits.add(visitDto);
+        });
+        visits.stream().filter(item -> item.getStartedAt().isAfter(LocalDateTime.now())).forEach(item -> {
+            Doctor doctor = doctorRepository.findById(item.getDoctorId()).orElseThrow();
+            Professional professional = professionalRepository.findById(doctor.getProfessionalId()).orElseThrow();
+            var visitDto = new VisitDto(item.getId(), item.getDoctorId(), doctor.getTitle(), professional.getTitle(), doctor.getVisitFee(), item.getCustomerId(), item.getStartedAt(), item.getEndAt(), item.getDuration(), item.getIsFree(), item.getCreatedAt());
+            lastVisits.add(visitDto);
+        });
         return new CustomerVisitsDto(onGoingVisits, lastVisits);
     }
 }
